@@ -10,6 +10,7 @@ import '../more/all_features_screen.dart';
 import '../evidence_locker/evidence_locker_screen.dart';
 import '../journey_mode/journey_mode_screen.dart';
 import '../legal_info/legal_info_screen.dart';
+import '../map/ui/area_safety_map_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String userName;
@@ -401,7 +402,12 @@ class _HomeContentState extends State<HomeContent> with SingleTickerProviderStat
   }
 
   Widget _buildSafetyCard() {
-    return Container(
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const AreaSafetyMapScreen()),
+      ),
+      child: Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -516,6 +522,7 @@ class _HomeContentState extends State<HomeContent> with SingleTickerProviderStat
           ),
         ],
       ),
+    ),
     )
     .animate()
     .fadeIn(delay: 300.ms, duration: 500.ms)

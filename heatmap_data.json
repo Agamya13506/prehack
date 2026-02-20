@@ -1,0 +1,90 @@
+{
+  "version": "1.0",
+  "updated_on": "2025-02-20",
+  "zones": [
+    {
+      "id": "DL001",
+      "lat": 28.6139,
+      "lng": 77.2090,
+      "intensity": 0.85,
+      "category": "assault"
+    },
+    {
+      "id": "DL002",
+      "lat": 28.6229,
+      "lng": 77.2080,
+      "intensity": 0.60,
+      "category": "harassment"
+    },
+    {
+      "id": "DL003",
+      "lat": 28.6050,
+      "lng": 77.2150,
+      "intensity": 0.45,
+      "category": "theft"
+    },
+    {
+      "id": "DL004",
+      "lat": 28.6170,
+      "lng": 77.1950,
+      "intensity": 0.90,
+      "category": "assault"
+    },
+    {
+      "id": "DL005",
+      "lat": 28.6320,
+      "lng": 77.2200,
+      "intensity": 0.30,
+      "category": "harassment"
+    },
+    {
+      "id": "DL006",
+      "lat": 28.6000,
+      "lng": 77.1800,
+      "intensity": 0.75,
+      "category": "theft"
+    },
+    {
+      "id": "DL007",
+      "lat": 28.6400,
+      "lng": 77.2300,
+      "intensity": 0.55,
+      "category": "harassment"
+    },
+    {
+      "id": "DL008",
+      "lat": 28.5900,
+      "lng": 77.2000,
+      "intensity": 0.20,
+      "category": "theft"
+    },
+    {
+      "id": "DL009",
+      "lat": 28.6250,
+      "lng": 77.1700,
+      "intensity": 0.70,
+      "category": "assault"
+    },
+    {
+      "id": "DL010",
+      "lat": 28.6100,
+      "lng": 77.2400,
+      "intensity": 0.40,
+      "category": "harassment"
+    },
+    {
+      "id": "DL011",
+      "lat": 28.6500,
+      "lng": 77.1600,
+      "intensity": 0.95,
+      "category": "assault"
+    },
+    {
+      "id": "DL012",
+      "lat": 28.5800,
+      "lng": 77.2300,
+      "intensity": 0.35,
+      "category": "theft"
+    }
+  ]
+}
