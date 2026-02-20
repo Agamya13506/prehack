@@ -1,0 +1,840 @@
+{
+  "skills": [
+    {
+      "skill_name": "allpagelogic",
+      "agent_name": "frontend-specialist",
+      "activation": {
+        "phrases": [
+          "allpagelogic",
+          "allpagelogic",
+          "allpagelogic"
+        ],
+        "regex": "(allpagelogic|allpagelogic|allpagelogic)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/allpagelogic/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "api-patterns",
+      "agent_name": "backend-specialist",
+      "activation": {
+        "phrases": [
+          "api-patterns",
+          "api patterns",
+          "api"
+        ],
+        "regex": "(api-patterns|api patterns|api)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/api-patterns/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "app-builder",
+      "agent_name": "orchestrator",
+      "activation": {
+        "phrases": [
+          "app-builder",
+          "app builder",
+          "app"
+        ],
+        "regex": "(app-builder|app builder|app)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/app-builder/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "architecture",
+      "agent_name": "project-planner",
+      "activation": {
+        "phrases": [
+          "architecture",
+          "architecture",
+          "architecture"
+        ],
+        "regex": "(architecture|architecture|architecture)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/architecture/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "bash-linux",
+      "agent_name": "devops-engineer",
+      "activation": {
+        "phrases": [
+          "bash-linux",
+          "bash linux",
+          "bash"
+        ],
+        "regex": "(bash-linux|bash linux|bash)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/bash-linux/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "behavioral-modes",
+      "agent_name": "orchestrator",
+      "activation": {
+        "phrases": [
+          "behavioral-modes",
+          "behavioral modes",
+          "behavioral"
+        ],
+        "regex": "(behavioral-modes|behavioral modes|behavioral)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/behavioral-modes/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "brainstorming",
+      "agent_name": "project-planner",
+      "activation": {
+        "phrases": [
+          "brainstorming",
+          "brainstorming",
+          "brainstorming"
+        ],
+        "regex": "(brainstorming|brainstorming|brainstorming)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/brainstorming/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "clean-code",
+      "agent_name": "orchestrator",
+      "activation": {
+        "phrases": [
+          "clean-code",
+          "clean code",
+          "clean"
+        ],
+        "regex": "(clean-code|clean code|clean)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/clean-code/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "code-review-checklist",
+      "agent_name": "orchestrator",
+      "activation": {
+        "phrases": [
+          "code-review-checklist",
+          "code review checklist",
+          "code"
+        ],
+        "regex": "(code-review-checklist|code review checklist|code)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/code-review-checklist/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "competitor-analysis",
+      "agent_name": "orchestrator",
+      "activation": {
+        "phrases": [
+          "competitor-analysis",
+          "competitor analysis",
+          "competitor"
+        ],
+        "regex": "(competitor-analysis|competitor analysis|competitor)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/competitor-analysis/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "database-design",
+      "agent_name": "database-architect",
+      "activation": {
+        "phrases": [
+          "database-design",
+          "database design",
+          "database"
+        ],
+        "regex": "(database-design|database design|database)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/database-design/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "deployment-procedures",
+      "agent_name": "devops-engineer",
+      "activation": {
+        "phrases": [
+          "deployment-procedures",
+          "deployment procedures",
+          "deployment"
+        ],
+        "regex": "(deployment-procedures|deployment procedures|deployment)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/deployment-procedures/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "documentation-templates",
+      "agent_name": "orchestrator",
+      "activation": {
+        "phrases": [
+          "documentation-templates",
+          "documentation templates",
+          "documentation"
+        ],
+        "regex": "(documentation-templates|documentation templates|documentation)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/documentation-templates/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "docx",
+      "agent_name": "orchestrator",
+      "activation": {
+        "phrases": [
+          "docx",
+          "docx",
+          "docx"
+        ],
+        "regex": "(docx|docx|docx)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/docx/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "flutter",
+      "agent_name": "mobile-developer",
+      "activation": {
+        "phrases": [
+          "flutter",
+          "flutter",
+          "flutter"
+        ],
+        "regex": "(flutter|flutter|flutter)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/flutter/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "frontend-design",
+      "agent_name": "frontend-specialist",
+      "activation": {
+        "phrases": [
+          "frontend-design",
+          "frontend design",
+          "frontend"
+        ],
+        "regex": "(frontend-design|frontend design|frontend)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/frontend-design/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "game-development",
+      "agent_name": "game-developer",
+      "activation": {
+        "phrases": [
+          "game-development",
+          "game development",
+          "game"
+        ],
+        "regex": "(game-development|game development|game)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/game-development/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "geo-fundamentals",
+      "agent_name": "seo-specialist",
+      "activation": {
+        "phrases": [
+          "geo-fundamentals",
+          "geo fundamentals",
+          "geo"
+        ],
+        "regex": "(geo-fundamentals|geo fundamentals|geo)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/geo-fundamentals/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "i18n-localization",
+      "agent_name": "orchestrator",
+      "activation": {
+        "phrases": [
+          "i18n-localization",
+          "i18n localization",
+          "i18n"
+        ],
+        "regex": "(i18n-localization|i18n localization|i18n)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/i18n-localization/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "intelligent-routing",
+      "agent_name": "orchestrator",
+      "activation": {
+        "phrases": [
+          "intelligent-routing",
+          "intelligent routing",
+          "intelligent"
+        ],
+        "regex": "(intelligent-routing|intelligent routing|intelligent)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/intelligent-routing/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "lint-and-validate",
+      "agent_name": "qa-automation-engineer",
+      "activation": {
+        "phrases": [
+          "lint-and-validate",
+          "lint and validate",
+          "lint"
+        ],
+        "regex": "(lint-and-validate|lint and validate|lint)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/lint-and-validate/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "mcp-builder",
+      "agent_name": "backend-specialist",
+      "activation": {
+        "phrases": [
+          "mcp-builder",
+          "mcp builder",
+          "mcp"
+        ],
+        "regex": "(mcp-builder|mcp builder|mcp)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/mcp-builder/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "mobile-design",
+      "agent_name": "mobile-developer",
+      "activation": {
+        "phrases": [
+          "mobile-design",
+          "mobile design",
+          "mobile"
+        ],
+        "regex": "(mobile-design|mobile design|mobile)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/mobile-design/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "nextjs-react-expert",
+      "agent_name": "frontend-specialist",
+      "activation": {
+        "phrases": [
+          "nextjs-react-expert",
+          "nextjs react expert",
+          "nextjs"
+        ],
+        "regex": "(nextjs-react-expert|nextjs react expert|nextjs)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/nextjs-react-expert/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "nodejs-best-practices",
+      "agent_name": "backend-specialist",
+      "activation": {
+        "phrases": [
+          "nodejs-best-practices",
+          "nodejs best practices",
+          "nodejs"
+        ],
+        "regex": "(nodejs-best-practices|nodejs best practices|nodejs)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/nodejs-best-practices/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "parallel-agents",
+      "agent_name": "orchestrator",
+      "activation": {
+        "phrases": [
+          "parallel-agents",
+          "parallel agents",
+          "parallel"
+        ],
+        "regex": "(parallel-agents|parallel agents|parallel)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/parallel-agents/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "pdf",
+      "agent_name": "orchestrator",
+      "activation": {
+        "phrases": [
+          "pdf",
+          "pdf",
+          "pdf"
+        ],
+        "regex": "(pdf|pdf|pdf)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/pdf/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "performance-profiling",
+      "agent_name": "orchestrator",
+      "activation": {
+        "phrases": [
+          "performance-profiling",
+          "performance profiling",
+          "performance"
+        ],
+        "regex": "(performance-profiling|performance profiling|performance)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/performance-profiling/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "plan-writing",
+      "agent_name": "project-planner",
+      "activation": {
+        "phrases": [
+          "plan-writing",
+          "plan writing",
+          "plan"
+        ],
+        "regex": "(plan-writing|plan writing|plan)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/plan-writing/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "powershell-windows",
+      "agent_name": "devops-engineer",
+      "activation": {
+        "phrases": [
+          "powershell-windows",
+          "powershell windows",
+          "powershell"
+        ],
+        "regex": "(powershell-windows|powershell windows|powershell)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/powershell-windows/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "python-patterns",
+      "agent_name": "backend-specialist",
+      "activation": {
+        "phrases": [
+          "python-patterns",
+          "python patterns",
+          "python"
+        ],
+        "regex": "(python-patterns|python patterns|python)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/python-patterns/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "red-team-tactics",
+      "agent_name": "penetration-tester",
+      "activation": {
+        "phrases": [
+          "red-team-tactics",
+          "red team tactics",
+          "red"
+        ],
+        "regex": "(red-team-tactics|red team tactics|red)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/red-team-tactics/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "seo-fundamentals",
+      "agent_name": "seo-specialist",
+      "activation": {
+        "phrases": [
+          "seo-fundamentals",
+          "seo fundamentals",
+          "seo"
+        ],
+        "regex": "(seo-fundamentals|seo fundamentals|seo)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/seo-fundamentals/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "server-management",
+      "agent_name": "devops-engineer",
+      "activation": {
+        "phrases": [
+          "server-management",
+          "server management",
+          "server"
+        ],
+        "regex": "(server-management|server management|server)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/server-management/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "skill-creator",
+      "agent_name": "orchestrator",
+      "activation": {
+        "phrases": [
+          "skill-creator",
+          "skill creator",
+          "skill"
+        ],
+        "regex": "(skill-creator|skill creator|skill)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/skill-creator/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "systematic-debugging",
+      "agent_name": "debugger",
+      "activation": {
+        "phrases": [
+          "systematic-debugging",
+          "systematic debugging",
+          "systematic"
+        ],
+        "regex": "(systematic-debugging|systematic debugging|systematic)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/systematic-debugging/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "tailwind-patterns",
+      "agent_name": "frontend-specialist",
+      "activation": {
+        "phrases": [
+          "tailwind-patterns",
+          "tailwind patterns",
+          "tailwind"
+        ],
+        "regex": "(tailwind-patterns|tailwind patterns|tailwind)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/tailwind-patterns/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "tdd-workflow",
+      "agent_name": "test-engineer",
+      "activation": {
+        "phrases": [
+          "tdd-workflow",
+          "tdd workflow",
+          "tdd"
+        ],
+        "regex": "(tdd-workflow|tdd workflow|tdd)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/tdd-workflow/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "testing-patterns",
+      "agent_name": "test-engineer",
+      "activation": {
+        "phrases": [
+          "testing-patterns",
+          "testing patterns",
+          "testing"
+        ],
+        "regex": "(testing-patterns|testing patterns|testing)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/testing-patterns/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "ui-ux-pro-max",
+      "agent_name": "frontend-specialist",
+      "activation": {
+        "phrases": [
+          "ui-ux-pro-max",
+          "ui ux pro max",
+          "ui"
+        ],
+        "regex": "(ui-ux-pro-max|ui ux pro max|ui)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/ui-ux-pro-max/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "vulnerability-scanner",
+      "agent_name": "security-auditor",
+      "activation": {
+        "phrases": [
+          "vulnerability-scanner",
+          "vulnerability scanner",
+          "vulnerability"
+        ],
+        "regex": "(vulnerability-scanner|vulnerability scanner|vulnerability)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/vulnerability-scanner/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "web-design-guidelines",
+      "agent_name": "orchestrator",
+      "activation": {
+        "phrases": [
+          "web-design-guidelines",
+          "web design guidelines",
+          "web"
+        ],
+        "regex": "(web-design-guidelines|web design guidelines|web)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/web-design-guidelines/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "webapp-testing",
+      "agent_name": "qa-automation-engineer",
+      "activation": {
+        "phrases": [
+          "webapp-testing",
+          "webapp testing",
+          "webapp"
+        ],
+        "regex": "(webapp-testing|webapp testing|webapp)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/webapp-testing/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    },
+    {
+      "skill_name": "xlsx",
+      "agent_name": "orchestrator",
+      "activation": {
+        "phrases": [
+          "xlsx",
+          "xlsx",
+          "xlsx"
+        ],
+        "regex": "(xlsx|xlsx|xlsx)"
+      },
+      "priority": 50,
+      "entry_point": ".agent/skills/xlsx/",
+      "tools_allowed": [
+        "Read",
+        "Grep",
+        "Bash"
+      ]
+    }
+  ]
+}
