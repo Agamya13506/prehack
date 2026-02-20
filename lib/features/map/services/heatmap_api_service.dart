@@ -2,29 +2,39 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/heatmap_zone.dart';
 
-/// Fetches live heatmap data from the remote API.
+/// Fetches live heatmap zone data from a public HTTP source.
+///
+/// No API key or authentication required.
+/// Source: project-hosted JSON on GitHub (public raw URL).
 class HeatmapApiService {
-  // Swap this URL for your actual endpoint in production.
-  // Falls back to a bundled mock response if the server is unreachable.
-  static const String _endpoint =
+  /// Primary public source — the heatmap_data.json committed to this repo.
+  /// Replace with your own hosted endpoint if needed.
+  static const String _primaryUrl =
       'https://raw.githubusercontent.com/Agamya13506/prehack/main/heatmap_data.json';
+
+  /// Fallback: any other public mirror (same format).
+  /// If both fail, the repository falls back to cached data.
+  static const String _fallbackUrl =
+      'https://raw.githubusercontent.com/WynautBhav/hj/main/heatmap_data.json';
 
   static const Duration _timeout = Duration(seconds: 10);
 
-  /// Returns [HeatmapData] on success, null on any failure.
+  /// Fetches heatmap data. Returns null on any failure (callers use cache).
   Future<HeatmapData?> fetchHeatmap() async {
-    try {
-      final response = await http
-          .get(Uri.parse(_endpoint))
-          .timeout(_timeout);
+    return await _tryFetch(_primaryUrl) ?? await _tryFetch(_fallbackUrl);
+  }
 
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body) as Map<String, dynamic>;
-        return HeatmapData.fromJson(json);
-      }
-      return null;
+  Future<HeatmapData?> _tryFetch(String url) async {
+    try {
+      final res = await http.get(Uri.parse(url)).timeout(_timeout);
+      if (res.statusCode != 200) return null;
+
+      final decoded = jsonDecode(res.body);
+      if (decoded is! Map<String, dynamic>) return null;
+
+      return HeatmapData.fromJson(decoded);
     } catch (_) {
-      // Network error, timeout, JSON parse error — all treated as "no data".
+      // Timeout, no network, bad JSON — all silently return null.
       return null;
     }
   }

@@ -5,12 +5,15 @@ import 'package:latlong2/latlong.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:geolocator/geolocator.dart';
 
-import '../../core/constants/app_colors.dart';
-import 'models/heatmap_zone.dart';
-import 'repositories/heatmap_repository.dart';
+import '../../../core/constants/app_colors.dart';
+import '../models/heatmap_zone.dart';
+import '../repositories/heatmap_repository.dart';
 
-/// Full-screen OSM map with heatmap overlay.
-/// Wired to Area Safety card on the home screen.
+/// Full-screen OSM map with informational heatmap overlay.
+///
+/// — Awareness-only. No SOS, alerts, or triggers.
+/// — Renders only zones within [_radiusMetres] of the user.
+/// — Never crashes from missing or corrupt data.
 class AreaSafetyMapScreen extends StatefulWidget {
   const AreaSafetyMapScreen({super.key});
 
@@ -19,29 +22,32 @@ class AreaSafetyMapScreen extends StatefulWidget {
 }
 
 class _AreaSafetyMapScreenState extends State<AreaSafetyMapScreen> {
+  // ── Constants ─────────────────────────────────────────────────────────────
+  static const double _radiusMetres     = 3000;   // only show zones within 3 km
+  static const double _defaultLat       = 28.6139; // New Delhi fallback
+  static const double _defaultLng       = 77.2090;
+
   // ── Dependencies ──────────────────────────────────────────────────────────
-  final HeatmapRepository _repo = HeatmapRepository();
-  final MapController _mapController = MapController();
+  final HeatmapRepository _repo          = HeatmapRepository();
+  final MapController     _mapController = MapController();
 
   // ── State ─────────────────────────────────────────────────────────────────
   HeatmapData? _heatmapData;
-  LatLng _userLocation = const LatLng(28.6139, 77.2090); // Delhi default
-  bool _loading = true;
-  bool _hasNoData = false;
-  bool _forceOffline = false;
-  bool _locationReady = false;
+  LatLng       _userLocation = const LatLng(_defaultLat, _defaultLng);
+  bool         _loading      = true;
+  bool         _hasNoData    = false;
+  bool         _forceOffline = false;
+  bool         _locationReady = false;
 
   StreamSubscription<List<ConnectivityResult>>? _connectivitySub;
 
   @override
   void initState() {
     super.initState();
+    // Run location + heatmap fetch in parallel.
     _init();
-    // Auto-refresh heatmap when connectivity returns.
-    _connectivitySub = Connectivity().onConnectivityChanged.listen((results) {
-      final online = results.any((r) => r != ConnectivityResult.none);
-      if (online && !_forceOffline) _loadHeatmap();
-    });
+    // Auto-refresh heatmap when device goes online.
+    _connectivitySub = Connectivity().onConnectivityChanged.listen(_onConnectivityChange);
   }
 
   @override
@@ -56,12 +62,16 @@ class _AreaSafetyMapScreenState extends State<AreaSafetyMapScreen> {
     await Future.wait([_getLocation(), _loadHeatmap()]);
   }
 
+  void _onConnectivityChange(List<ConnectivityResult> results) {
+    final online = results.any((r) => r != ConnectivityResult.none);
+    if (online && !_forceOffline && mounted) _loadHeatmap();
+  }
+
+  /// Gets GPS fix; silently falls back to [_defaultLat/Lng] on any error.
   Future<void> _getLocation() async {
     try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) return;
-
-      LocationPermission perm = await Geolocator.checkPermission();
+      if (!await Geolocator.isLocationServiceEnabled()) return;
+      var perm = await Geolocator.checkPermission();
       if (perm == LocationPermission.denied) {
         perm = await Geolocator.requestPermission();
       }
@@ -70,18 +80,19 @@ class _AreaSafetyMapScreenState extends State<AreaSafetyMapScreen> {
       final pos = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.medium,
       );
-      if (mounted) {
-        setState(() {
-          _userLocation = LatLng(pos.latitude, pos.longitude);
-          _locationReady = true;
-        });
-        _mapController.move(_userLocation, 13);
-      }
+      if (!mounted) return;
+      setState(() {
+        _userLocation  = LatLng(pos.latitude, pos.longitude);
+        _locationReady = true;
+      });
+      // Pan map to user once location is known.
+      _mapController.move(_userLocation, 14);
     } catch (_) {
-      // Use default Delhi coords if GPS fails.
+      // GPS unavailable — default coords are already set.
     }
   }
 
+  /// Fetches heatmap data; never throws.
   Future<void> _loadHeatmap() async {
     if (!mounted) return;
     setState(() => _loading = true);
@@ -96,10 +107,9 @@ class _AreaSafetyMapScreenState extends State<AreaSafetyMapScreen> {
       _loading     = false;
     });
 
-    // Show appropriate snackbar without blocking UI.
+    // Non-blocking status message.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      if (result.hasNoData) return; // banner handles this
+      if (!mounted || result.hasNoData) return;
       _showSnackbar(
         result.isLive
             ? '✅  Live safety data updated'
@@ -109,53 +119,63 @@ class _AreaSafetyMapScreenState extends State<AreaSafetyMapScreen> {
     });
   }
 
-  void _showSnackbar(String msg, Color color) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+  void _showSnackbar(String msg, Color bg) {
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(SnackBar(
         content: Text(msg,
             style: const TextStyle(
                 color: Colors.white, fontWeight: FontWeight.w500)),
-        backgroundColor: color,
+        backgroundColor: bg,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
+      ));
   }
 
   // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
+    final nearZones = _zonesInRadius();
+
     return Scaffold(
       backgroundColor: AppColors.scaffold,
       body: Stack(
         children: [
-          // ── Map layer ────────────────────────────────────────────────────
+          // ── OSM Map (no API key) ─────────────────────────────────────────
           FlutterMap(
             mapController: _mapController,
             options: MapOptions(
               initialCenter: _userLocation,
-              initialZoom: 13,
+              initialZoom: 14,
               minZoom: 5,
               maxZoom: 18,
             ),
             children: [
-              // OSM tile layer — no API key required
               TileLayer(
-                urlTemplate:
-                    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.medusa.safetyapp',
-                // Fallback: render blank tiles when offline
-                errorImage: const AssetImage('assets/blank_tile.png'),
+                // No errorImage — silently shows blank when offline.
               ),
 
-              // Heatmap circles layer
-              if (_heatmapData != null)
-                CircleLayer(circles: _buildHeatCircles()),
+              // 3 km radius boundary ring (informational)
+              CircleLayer(circles: [
+                CircleMarker(
+                  point: _userLocation,
+                  radius: _radiusMetres,
+                  useRadiusInMeter: true,
+                  color: AppColors.accent.withAlpha(15),
+                  borderColor: AppColors.accent.withAlpha(80),
+                  borderStrokeWidth: 1.0,
+                ),
+              ]),
 
-              // User location marker
+              // Heatmap circles — only zones within 3 km
+              if (nearZones.isNotEmpty)
+                CircleLayer(circles: _buildHeatCircles(nearZones)),
+
+              // User location marker — always shown
               MarkerLayer(
                 markers: [
                   Marker(
@@ -177,52 +197,41 @@ class _AreaSafetyMapScreenState extends State<AreaSafetyMapScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _TopBar(
-                    zoneCount: _heatmapData?.zones.length ?? 0,
+                    nearZoneCount: nearZones.length,
                     onRefresh: _loadHeatmap,
                     onBack: () => Navigator.pop(context),
+                    isLoading: _loading,
                   ),
                   const SizedBox(height: 8),
-                  // "No data" warning banner
                   if (_hasNoData) const _NoDataBanner(),
                 ],
               ),
             ),
           ),
 
-          // ── Loading overlay ───────────────────────────────────────────────
+          // ── Thin loading bar (non-blocking) ──────────────────────────────
           if (_loading)
-            Container(
-              color: Colors.black26,
-              child: const Center(
-                child: Card(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                        SizedBox(width: 16),
-                        Text('Loading safety data…'),
-                      ],
-                    ),
-                  ),
-                ),
+            const Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: LinearProgressIndicator(
+                minHeight: 3,
+                color: AppColors.accent,
+                backgroundColor: Colors.transparent,
               ),
             ),
 
-          // ── Bottom panel ─────────────────────────────────────────────────
+          // ── Bottom info panel ─────────────────────────────────────────────
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             child: _BottomPanel(
               forceOffline: _forceOffline,
-              updatedOn: _heatmapData?.updatedOn ?? '—',
-              zoneCount: _heatmapData?.zones.length ?? 0,
+              updatedOn: _heatmapData?.updatedOn ?? '',
+              nearCount: nearZones.length,
+              totalCount: _heatmapData?.zones.length ?? 0,
               onOfflineToggle: (val) {
                 setState(() => _forceOffline = val);
                 _loadHeatmap();
@@ -237,18 +246,20 @@ class _AreaSafetyMapScreenState extends State<AreaSafetyMapScreen> {
 
   // ── Helpers ───────────────────────────────────────────────────────────────
 
-  List<CircleMarker> _buildHeatCircles() {
-    if (_heatmapData == null) return [];
-    return _heatmapData!.zones.map((zone) {
-      return CircleMarker(
-        point: LatLng(zone.latitude, zone.longitude),
-        radius: zone.radiusMetres,    // metres
-        useRadiusInMeter: true,
-        color: zone.riskColor.withAlpha((zone.intensity * 130).round()),
-        borderColor: zone.riskColor.withAlpha(200),
-        borderStrokeWidth: 1.5,
-      );
-    }).toList();
+  /// Zones within [_radiusMetres] of user. Returns [] if no data.
+  List<HeatmapZone> _zonesInRadius() {
+    return _heatmapData?.zonesNear(_userLocation, _radiusMetres) ?? [];
+  }
+
+  List<CircleMarker> _buildHeatCircles(List<HeatmapZone> zones) {
+    return zones.map((zone) => CircleMarker(
+      point: LatLng(zone.latitude, zone.longitude),
+      radius: zone.radiusMetres,
+      useRadiusInMeter: true,
+      color: zone.riskColor.withAlpha((zone.intensity * 130).round()),
+      borderColor: zone.riskColor.withAlpha(200),
+      borderStrokeWidth: 1.5,
+    )).toList();
   }
 }
 
@@ -257,14 +268,16 @@ class _AreaSafetyMapScreenState extends State<AreaSafetyMapScreen> {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _TopBar extends StatelessWidget {
-  final int zoneCount;
+  final int nearZoneCount;
   final VoidCallback onRefresh;
   final VoidCallback onBack;
+  final bool isLoading;
 
   const _TopBar({
-    required this.zoneCount,
+    required this.nearZoneCount,
     required this.onRefresh,
     required this.onBack,
+    required this.isLoading,
   });
 
   @override
@@ -276,10 +289,9 @@ class _TopBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(25),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
+              color: Colors.black.withAlpha(20),
+              blurRadius: 8,
+              offset: const Offset(0, 2)),
         ],
       ),
       child: Row(
@@ -289,7 +301,7 @@ class _TopBar extends StatelessWidget {
             child: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
           ),
           const SizedBox(width: 12),
-          const Icon(Icons.shield_rounded, color: AppColors.accent, size: 20),
+          const Icon(Icons.map_outlined, color: AppColors.accent, size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
@@ -298,31 +310,34 @@ class _TopBar extends StatelessWidget {
                 const Text(
                   'Area Safety Map',
                   style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary),
                 ),
                 Text(
-                  '$zoneCount risk zones identified',
+                  '$nearZoneCount risk zones within 3 km',
                   style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
+                      fontSize: 12, color: AppColors.textSecondary),
                 ),
               ],
             ),
           ),
+          // Manual refresh button
           GestureDetector(
-            onTap: onRefresh,
+            onTap: isLoading ? null : onRefresh,
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.accentLight,
+                color: isLoading
+                    ? AppColors.divider
+                    : AppColors.accentLight,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.refresh_rounded,
-                  color: AppColors.accent, size: 18),
+              child: Icon(
+                Icons.refresh_rounded,
+                color: isLoading ? AppColors.textSecondary : AppColors.accent,
+                size: 18,
+              ),
             ),
           ),
         ],
@@ -345,11 +360,11 @@ class _NoDataBanner extends StatelessWidget {
       ),
       child: const Row(
         children: [
-          Icon(Icons.wifi_off_rounded, color: AppColors.warning, size: 18),
+          Icon(Icons.cloud_off_rounded, color: AppColors.warning, size: 18),
           SizedBox(width: 10),
           Expanded(
             child: Text(
-              'No safety data available. Connect to internet to load risk zones.',
+              'No safety data available · Map still works offline',
               style: TextStyle(fontSize: 12, color: AppColors.warning),
             ),
           ),
@@ -362,14 +377,16 @@ class _NoDataBanner extends StatelessWidget {
 class _BottomPanel extends StatelessWidget {
   final bool forceOffline;
   final String updatedOn;
-  final int zoneCount;
+  final int nearCount;
+  final int totalCount;
   final ValueChanged<bool> onOfflineToggle;
   final VoidCallback onCenterUser;
 
   const _BottomPanel({
     required this.forceOffline,
     required this.updatedOn,
-    required this.zoneCount,
+    required this.nearCount,
+    required this.totalCount,
     required this.onOfflineToggle,
     required this.onCenterUser,
   });
@@ -377,25 +394,20 @@ class _BottomPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 32),
       decoration: const BoxDecoration(
         color: AppColors.primary,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 12,
-            offset: Offset(0, -2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 12, offset: Offset(0, -2)),
         ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Drag handle
+          // handle
           Container(
-            width: 40,
-            height: 4,
+            width: 40, height: 4,
             decoration: BoxDecoration(
               color: AppColors.divider,
               borderRadius: BorderRadius.circular(2),
@@ -403,36 +415,35 @@ class _BottomPanel extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
-          // Legend
-          Row(
+          // Legend row
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _LegendDot(color: Colors.red, label: 'High Risk'),
-              _LegendDot(color: Colors.orange, label: 'Medium Risk'),
-              _LegendDot(color: Colors.amber, label: 'Low Risk'),
+              _LegendDot(color: Colors.red,    label: 'High risk'),
+              _LegendDot(color: Colors.orange, label: 'Medium risk'),
+              _LegendDot(color: Colors.amber,  label: 'Low risk'),
             ],
           ),
-
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           const Divider(height: 1),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
-          // Stats row
+          // Stats + centre-user
           Row(
             children: [
               _StatChip(
-                icon: Icons.warning_amber_rounded,
-                label: '$zoneCount zones',
+                icon: Icons.location_on_rounded,
+                label: '$nearCount within 3 km',
                 color: AppColors.warning,
               ),
               const SizedBox(width: 8),
-              _StatChip(
-                icon: Icons.update_rounded,
-                label: updatedOn.isEmpty ? '—' : 'Updated $updatedOn',
-                color: AppColors.textSecondary,
-              ),
+              if (updatedOn.isNotEmpty)
+                _StatChip(
+                  icon: Icons.update_rounded,
+                  label: updatedOn,
+                  color: AppColors.textSecondary,
+                ),
               const Spacer(),
-              // Center on user button
               GestureDetector(
                 onTap: onCenterUser,
                 child: Container(
@@ -448,17 +459,17 @@ class _BottomPanel extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
-          // Simulate Offline toggle
+          // Simulate offline toggle
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
               color: AppColors.secondary,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 color: forceOffline
-                    ? AppColors.warning.withAlpha(120)
+                    ? AppColors.warning.withAlpha(100)
                     : AppColors.divider,
               ),
             ),
@@ -466,7 +477,7 @@ class _BottomPanel extends StatelessWidget {
               children: [
                 Icon(
                   Icons.cloud_off_rounded,
-                  size: 20,
+                  size: 18,
                   color: forceOffline
                       ? AppColors.warning
                       : AppColors.textSecondary,
@@ -479,13 +490,12 @@ class _BottomPanel extends StatelessWidget {
                       Text(
                         'Simulate Offline Mode',
                         style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textPrimary,
-                        ),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textPrimary),
                       ),
                       Text(
-                        'Use cached data only',
+                        'Force cached data only',
                         style: TextStyle(
                             fontSize: 12, color: AppColors.textSecondary),
                       ),
@@ -499,6 +509,14 @@ class _BottomPanel extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+
+          // Disclaimer
+          const SizedBox(height: 10),
+          const Text(
+            'ℹ️  This map is for awareness only and does not trigger any alerts.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
           ),
         ],
       ),
@@ -517,14 +535,13 @@ class _LegendDot extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 12,
-          height: 12,
+          width: 10, height: 10,
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 6),
         Text(label,
             style: const TextStyle(
-                fontSize: 12, color: AppColors.textSecondary)),
+                fontSize: 11, color: AppColors.textSecondary)),
       ],
     );
   }
@@ -548,18 +565,18 @@ class _StatChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: color),
+          Icon(icon, size: 12, color: color),
           const SizedBox(width: 4),
           Text(label,
               style: TextStyle(
-                  fontSize: 12, color: color, fontWeight: FontWeight.w500)),
+                  fontSize: 11, color: color, fontWeight: FontWeight.w500)),
         ],
       ),
     );
   }
 }
 
-/// Pulsing location marker — purple dot with white border.
+/// Animated user location dot — purple when GPS ready, orange while waiting.
 class _UserMarker extends StatelessWidget {
   final bool ready;
   const _UserMarker({required this.ready});
@@ -569,27 +586,23 @@ class _UserMarker extends StatelessWidget {
     return Stack(
       alignment: Alignment.center,
       children: [
-        // Outer pulse ring
         Container(
-          width: 48,
-          height: 48,
+          width: 48, height: 48,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppColors.accent.withAlpha(40),
+            color: AppColors.accent.withAlpha(35),
           ),
         ),
-        // Inner dot
         Container(
-          width: 20,
-          height: 20,
+          width: 18, height: 18,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: ready ? AppColors.accent : AppColors.warning,
-            border: Border.all(color: Colors.white, width: 3),
+            border: Border.all(color: Colors.white, width: 2.5),
             boxShadow: [
               BoxShadow(
                 color: (ready ? AppColors.accent : AppColors.warning)
-                    .withAlpha(80),
+                    .withAlpha(70),
                 blurRadius: 6,
               ),
             ],
